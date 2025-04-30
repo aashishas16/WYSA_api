@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: Wysa Sleep API
+  version: 1.0.0
+  description: API documentation for the Wysa Sleep Assessment App.
+
+servers:
+  - url: https://api.wysa.io
+
+paths:
+  /api/app-info:
+    get:
+      summary: Get initial app information
+      responses:
+        '200':
+          description: App info retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfoResponse'
+
+  /api/users:
+    post:
+      summary: Create user with nickname
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+      responses:
+        '200':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /api/users/{user_id}/accept-terms:
+    put:
+      summary: Accept terms and conditions
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Terms accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTermsResponse'
+
+  /api/users/{user_id}/assessments:
+    post:
+      summary: Start a new sleep assessment
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Assessment started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssessmentStartResponse'
+
+  /api/assessments/{assessment_id}/sleep-goal:
+    put:
+      summary: Update sleep goal
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                sleep_goal:
+                  type: string
+                  enum: [FALL_ASLEEP_EASILY, SLEEP_THROUGH_NIGHT, WAKE_REFRESHED]
+      responses:
+        '200':
+          description: Sleep goal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepResponse'
+
+  /api/assessments/{assessment_id}/issue-duration:
+    put:
+      summary: Update sleep issue duration
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                sleep_issue_duration:
+                  type: string
+                  enum: [LESS_THAN_2_WEEKS, 2_TO_8_WEEKS, MORE_THAN_8_WEEKS]
+      responses:
+        '200':
+          description: Duration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepResponse'
+
+  /api/assessments/{assessment_id}/bedtime:
+    put:
+      summary: Update bedtime
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                bedtime:
+                  type: string
+                  format: time
+      responses:
+        '200':
+          description: Bedtime updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepResponse'
+
+  /api/assessments/{assessment_id}/wake-time:
+    put:
+      summary: Update wake time
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                wake_time:
+                  type: string
+                  format: time
+      responses:
+        '200':
+          description: Wake time updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepResponse'
+
+  /api/assessments/{assessment_id}/sleep-hours:
+    put:
+      summary: Update sleep hours
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                sleep_hours:
+                  type: number
+      responses:
+        '200':
+          description: Sleep hours updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepResponse'
+
+  /api/assessments/{assessment_id}/complete:
+    put:
+      summary: Complete the assessment and get results
+      parameters:
+        - in: path
+          name: assessment_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Assessment complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssessmentCompleteResponse'
+
+components:
+  schemas:
+    AppInfoResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            app_name:
+              type: string
+            welcome_message:
+              type: string
+            terms_url:
+              type: string
+            privacy_url:
+              type: string
+
+    UserResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            user_id:
+              type: string
+            nickname:
+              type: string
+            next_step:
+              type: string
+
+    UserTermsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            user_id:
+              type: string
+            terms_accepted:
+              type: boolean
+            next_step:
+              type: string
+
+    AssessmentStartResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            assessment_id:
+              type: string
+            current_step:
+              type: string
+            message:
+              type: string
+
+    StepResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            assessment_id:
+              type: string
+            next_step:
+              type: string
+
+    AssessmentCompleteResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            assessment_id:
+              type: string
+            completed:
+              type: boolean
+            sleep_efficiency:
+              type: number
+            message:
+              type: string
+            recommendations:
+              type: array
+              items:
+                type: string
